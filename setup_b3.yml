@@ -1,0 +1,56 @@
+---
+
+- hosts: b3
+  tasks:
+    - name: Install sudo
+      apt:
+        name: sudo
+        update_cache: yes
+      become: yes
+      become_method: su
+      become_user: root
+    - name: Add excito to sudoers
+      user:
+        name: excito
+        groups: sudo
+        append: yes
+      become: yes
+      become_method: su
+      become_user: root
+    - name: Reset connection to pickup new group
+      meta: reset_connection
+    - name: Allow 'sudo' users to sudo passwordless
+      lineinfile:
+        path: /etc/sudoers
+        state: present
+        regexp: '^%sudo'
+        line: '%sudo   ALL=(ALL:ALL) NOPASSWD:ALL'
+        validate: '/usr/sbin/visudo -cf %s'
+      become: yes
+    - name: Add user enver
+      user:
+        name: enver
+        group: enver
+        append: yes
+        groups: sudo
+        shell: /bin/bash
+      become: yes
+    - name: Add public SSH keys for enver
+      authorized_key:
+        key: |
+          ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJLcJhj6RAu2MV4qkLnQvEMjpC0+u8wNUXFN4C0mqIK1 enver@desktop-enver
+        user: enver
+      become: yes
+    - name: Disable SSH password login
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: '^(#\s*)?PasswordAuthentication '
+        line: "PasswordAuthentication no"
+      become: yes
+      notify: restart sshd
+
+  handlers:
+    - name: restart sshd
+      service: name=sshd state=restarted
+      become: yes
+
