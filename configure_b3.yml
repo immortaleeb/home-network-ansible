@@ -1,0 +1,11 @@
+---
+
+- hosts: b3
+  tasks:
+    - name: Increase inotify limits
+      sysctl:
+        name: fs.inotify.max_user_watches
+        value: 204800
+        sysctl_set: yes
+      become: yes
+
