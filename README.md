@@ -12,3 +12,13 @@ ansible-playbook -i hosts setup_b3.yml --user excito --ask-pass --ask-become-pas
 
 The default user and password should be `excito`.
 
+## Raspberry pi
+
+To setup a fresh installation of raspberry pi os, run:
+
+```
+ansible-playbook -i hosts setup_raspberrypi.yml --user pi --ask-pass
+```
+
+The default password should be `raspberrypi`
+
